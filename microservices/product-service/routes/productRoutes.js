@@ -2,6 +2,17 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 
+const auth = require('../../backend/middleware/auth');
+
+router.get('/', auth, async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.json(products);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // ✅ Fetch products from Walmart
 const fetchWalmartProducts = async () => {
     try {

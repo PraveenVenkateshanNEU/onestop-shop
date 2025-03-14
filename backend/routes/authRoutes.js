@@ -35,10 +35,40 @@ router.post('/login', async (req, res) => {
             expiresIn: '1h'
         });
 
-        res.json({ token });
+        req.session.user = {
+            id: user._id,
+            username: user.username,
+            role: user.role,
+        };
+
+        res.json({ token, message: 'Login successful', session: req.session.user });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
+
+// Get Current Session
+router.get('/session', (req, res) => {
+    if (req.session.user) {
+        res.json({ session: req.session.user });
+    } else {
+        res.status(401).json({ message: 'No active session' });
+    }
+});
+
+// Logout Route
+router.post('/logout', (req, res) => {
+    if (!req.session) {
+        return res.status(400).json({ message: "No active session found" });
+    }
+
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Logout failed' });
+        }
+        res.json({ message: 'Logged out successfully' });
+    });
+});
+
 
 module.exports = router;
