@@ -1,8 +1,9 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
-
-const auth = require('../../backend/middleware/auth');
+const path = require('path');
+const auth = require(path.resolve(__dirname, '../../../backend/middleware/auth'));
+//const auth = require('../../backend/middleware/auth');
 
 router.get('/', auth, async (req, res) => {
     try {
