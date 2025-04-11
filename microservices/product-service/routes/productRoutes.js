@@ -5,19 +5,11 @@ const path = require('path');
 const auth = require(path.resolve(__dirname, '../../../backend/middleware/auth'));
 //const auth = require('../../backend/middleware/auth');
 
-router.get('/', auth, async (req, res) => {
-    try {
-        const products = await Product.find();
-        res.json(products);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
 
 // ✅ Fetch products from Walmart
 const fetchWalmartProducts = async () => {
     try {
-        const response = await axios.get('http://localhost:5008/api/walmart');
+        const response = await axios.get('http://localhost:5000/api/walmart');
         return response.data;
     } catch (err) {
         console.error('Error fetching Walmart products:', err.message);
@@ -28,7 +20,7 @@ const fetchWalmartProducts = async () => {
 // ✅ Fetch products from Amazon
 const fetchAmazonProducts = async () => {
     try {
-        const response = await axios.get('http://localhost:5009/api/amazon');
+        const response = await axios.get('http://localhost:5000/api/amazon');
         return response.data;
     } catch (err) {
         console.error('Error fetching Amazon products:', err.message);
@@ -39,7 +31,7 @@ const fetchAmazonProducts = async () => {
 // ✅ Fetch products from Temu
 const fetchTemuProducts = async () => {
     try {
-        const response = await axios.get('http://localhost:5010/api/temu');
+        const response = await axios.get('http://localhost:5000/api/temu');
         return response.data;
     } catch (err) {
         console.error('Error fetching Temu products:', err.message);

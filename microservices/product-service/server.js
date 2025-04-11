@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 connectDB();
 
 // ✅ Use Product Routes
-app.use('/api/products', productRoutes);
+app.use('/', productRoutes);
 
 app.listen(5006, () => {
     console.log('📦 Product Service running on port 5006');
