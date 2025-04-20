@@ -1,0 +1,14 @@
+<%- include('layout') %>
+
+<h2>Login</h2>
+<form method="POST">
+    <input type="email" name="email" placeholder="Email" class="form-control mb-2" required />
+    <input type="password" name="password" placeholder="Password" class="form-control mb-2" required />
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+<% if (typeof error !== 'undefined') { %>
+    <div class="text-danger mt-2"><%= error %></div>
+<% } %>
+</div>
+</body>
+</html>
