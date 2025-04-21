@@ -39,12 +39,19 @@ const fetchTemuProducts = async () => {
     }
 };
 
+// ✅ Utility function to tag source
+const tagWithSource = (products, source) =>
+    products.map(p => ({ ...p, source }));
+
 // ✅ Aggregate all products from Walmart, Amazon, and Temu
 router.get('/', async (req, res) => {
     try {
-        const walmartProducts = await fetchWalmartProducts();
-        const amazonProducts = await fetchAmazonProducts();
-        const temuProducts = await fetchTemuProducts();
+        // const walmartProducts = await fetchWalmartProducts();
+        // const amazonProducts = await fetchAmazonProducts();
+        // const temuProducts = await fetchTemuProducts();
+        const walmartProducts = tagWithSource(await fetchWalmartProducts(), 'Walmart');
+        const amazonProducts = tagWithSource(await fetchAmazonProducts(), 'Amazon');
+        const temuProducts = tagWithSource(await fetchTemuProducts(), 'Temu');
 
         const allProducts = [...walmartProducts, ...amazonProducts, ...temuProducts];
         res.json(allProducts);

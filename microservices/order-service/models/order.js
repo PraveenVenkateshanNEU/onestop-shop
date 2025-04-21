@@ -13,7 +13,7 @@ const OrderSchema = new mongoose.Schema({
         }
     ],
     totalAmount: { type: Number, required: true },
-    status: { type: String, enum: ['Pending', 'Shipped', 'Delivered'], default: 'Pending' },
+    status: { type: String, enum: ['Pending', 'Placed', 'Shipped', 'Delivered'], default: 'Placed' },
     trackingId: { type: String, default: uuidv4 },
     createdAt: { type: Date, default: Date.now }
 });

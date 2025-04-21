@@ -9,6 +9,8 @@
         <nav class="mb-4">
             <% if (user) { %>
                 <a href="/products">Products</a> |
+                <a href="/cart">Cart (<%= cart.length %>)</a> |
+                <a href="/orders">Orders</a> |
                 <a href="/logout">Logout</a>
             <% } else { %>
                 <a href="/login">Login</a> |

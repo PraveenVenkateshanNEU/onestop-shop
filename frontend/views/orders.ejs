@@ -1,0 +1,23 @@
+<%- include('layout') %>
+
+<h2>Order History</h2>
+<% if (orders.length === 0) { %>
+    <p>You have no orders.</p>
+<% } else { %>
+    <% orders.forEach(order => { %>
+        <div class="card mb-3">
+            <div class="card-header">Order ID: <%= order._id %> | Status: <%= order.status %></div>
+            <ul class="list-group list-group-flush">
+                <% order.products.forEach(p => { %>
+                    <li class="list-group-item">
+                        <strong><%= p.name %></strong> — $<%= p.price %> × <%= p.quantity %> = $<%= (p.price * p.quantity).toFixed(2) %>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+    <% }) %>
+<% } %>
+
+</div>
+</body>
+</html>
