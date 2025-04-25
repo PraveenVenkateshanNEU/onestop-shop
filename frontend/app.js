@@ -35,6 +35,17 @@ app.use((req, res, next) => {
     next();
 });
 
+function isAuthenticated(req, res, next) {
+  if (!req.session.user) return res.redirect('/login');
+  next();
+}
+function isAdmin(req, res, next) {
+  if (req.session.user.role !== 'admin') return res.redirect('/');
+  next();
+}
+
+
+
 // ✅ Route: Home (Login)
 app.get('/', (req, res) => {
     res.redirect('/login');
@@ -46,17 +57,41 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    //const { email, password } = req.body;
 
     try {
-        const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
-        req.session.token = response.data.token;
+        //const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
+        const { email, password } = req.body;
+        const { data } = await axios.post(
+          `${API_BASE_URL}/api/auth/login`,
+          { email, password },    { withCredentials: true }
+        );
+        // store JWT
+          req.session.token = data.token;
+        // decode to get role, username, id
+        const payload = JSON.parse(
+          Buffer.from(data.token.split('.')[1], 'base64').toString()
+        );
+        req.session.user = {
+          userId: payload.userId,
+          username: payload.username,
+          role: payload.role
+        };
+        return res.redirect(
+          payload.role === 'admin' ? '/admin/dashboard' : '/products'
+        );
 
-        // Optional: store user data in session if needed
-        const decoded = JSON.parse(Buffer.from(response.data.token.split('.')[1], 'base64').toString());
-        req.session.user = decoded;
+        // req.session.token = response.data.token;
 
-        res.redirect('/products');
+        // // Optional: store user data in session if needed
+        // const decoded = JSON.parse(Buffer.from(response.data.token.split('.')[1], 'base64').toString());
+        // req.session.user = decoded;
+
+        // if (decoded.role === 'admin') {
+        //     res.redirect('http://localhost:3005/'); // Admin Panel
+        // } else {
+        //     res.redirect('/products'); // Regular user
+        // }
     } catch (err) {
         res.render('login', { error: 'Invalid credentials' });
     }
@@ -152,6 +187,80 @@ app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/login');
 });
+
+app.get(
+  '/admin/dashboard',
+  isAuthenticated,
+  isAdmin,
+  async (req, res) => {
+    try {
+      // fetch all sources + orders
+      const [walmart, amazon, temu, orders] = await Promise.all([
+        axios.get(`${API_BASE_URL}/api/walmart`, {
+          headers: { Authorization: `Bearer ${req.session.token}` }
+        }),
+        axios.get(`${API_BASE_URL}/api/amazon`, {
+          headers: { Authorization: `Bearer ${req.session.token}` }
+        }),
+        axios.get(`${API_BASE_URL}/api/temu`, {
+          headers: { Authorization: `Bearer ${req.session.token}` }
+        }),
+        axios.get(`${API_BASE_URL}/api/orders`, {
+          headers: { Authorization: `Bearer ${req.session.token}` }
+        }),
+      ]);
+
+      res.render('dashboard', {
+        walmart:  walmart.data,
+        amazon:   amazon.data,
+        temu:     temu.data,
+        orders:   orders.data,
+        error:    null
+      });
+    } catch (e) {
+      res.render('dashboard', {
+        walmart: [], amazon: [], temu: [],
+         orders: [], 
+        error: 'Failed to load admin data'
+      });
+    }
+  }
+);
+
+
+
+
+// Add product to any source
+app.post(
+  '/admin/product/add',
+  isAuthenticated,
+  isAdmin,
+  async (req, res) => {
+    const { source, name, description, price, category } = req.body;
+    await axios.post(
+      `${API_BASE_URL}/api/${source}/add`,
+      { name, description, price, category },
+      { headers: { Authorization: `Bearer ${req.session.token}` } }
+    );
+    res.redirect('/admin/dashboard');
+  }
+);
+
+// Delete product
+app.post(
+  '/admin/product/delete',
+  isAuthenticated,
+  isAdmin,
+  async (req, res) => {
+    const { source, id } = req.body;
+    await axios.delete(
+      `${API_BASE_URL}/api/${source}/delete/${id}`,
+      { headers: { Authorization: `Bearer ${req.session.token}` } }
+    );
+    res.redirect('/admin/dashboard');
+  }
+);
+
 
 // ✅ Start Server
 const PORT = process.env.PORT || 3000;

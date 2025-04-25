@@ -13,7 +13,7 @@ router.post('/register', async (req, res) => {
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ message: 'User already exists' });
 
-        user = new User({ username, email, password });
+        user = new User({ username, email, password, role: 'user'});
         await user.save();
 
         res.status(201).json({ message: 'User registered successfully' });
@@ -28,9 +28,15 @@ router.post('/login', async (req, res) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
 
-        if (!user || !(await user.comparePassword(password)))
+        console.log('Login attempt for:', email);
+        console.log('User found:', user ? 'Yes' : 'No');
+        
+        if (!user || !(await user.comparePassword(password))){
+            console.log('Password match:', false);
             return res.status(400).json({ message: 'Invalid credentials' });
-
+        }
+            
+        console.log('Password match:', true);
         const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
             expiresIn: '1h'
         });
@@ -43,6 +49,7 @@ router.post('/login', async (req, res) => {
 
         res.json({ token, message: 'Login successful', session: req.session.user });
     } catch (err) {
+        console.error('Login error:', err.message);
         res.status(500).json({ message: err.message });
     }
 });

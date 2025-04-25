@@ -1,6 +1,10 @@
 const express = require('express');
 const Product = require('../models/product');
 const router = express.Router();
+const debug = require('debug')('temu:delete');
+
+const path = require('path');
+const auth = require(path.resolve(__dirname, '../../../backend/middleware/auth'));
 
 // Get Temu Products
 router.get('/', async (req, res) => {
@@ -13,7 +17,10 @@ router.get('/', async (req, res) => {
 });
 
 // Add Temu Product
-router.post('/add', async (req, res) => {
+router.post('/add', auth, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied' });
+    }
     try {
         const { name, description, price, category } = req.body;
 
@@ -31,5 +38,32 @@ router.post('/add', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+
+// Delete Amazon Product
+router.delete(
+    '/delete/:id',
+    auth,
+    async (req, res) => {
+      // 1) guard admin
+      debug('Incoming DELETE %s by user %o', req.params.id, req.user);
+      if (req.user.role !== 'admin') {
+        debug(' → access denied for', req.user);
+        return res.status(403).json({ message: 'Access denied' });
+      }
+  
+      try {
+        // 2) remove by ID
+        const { id } = req.params;
+        debug(' → removing product', id);
+        await Product.deleteOne({ _id: id });
+        debug(' → removal successful');
+        return res.json({ message: 'Deleted successfully' });
+      } catch (err) {
+        console.error('Delete error:', err);
+        return res.status(500).json({ message: err.message });
+      }
+    }
+  );
+  
 
 module.exports = router;

@@ -19,7 +19,12 @@ app.use(
             mongoUrl: `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@shock.ghg6a.mongodb.net/${process.env.MONGODB_DBNAME}?retryWrites=true&w=majority&appName=Shock`,
             collectionName: 'sessions',
         }),
-        cookie: { maxAge: 1000 * 60 * 60 }  // 1-hour session expiry
+        cookie: {
+            maxAge: 1000 * 60 * 60,
+            httpOnly: true,
+            sameSite: 'none',
+            secure: false
+          }
     })
 );
 

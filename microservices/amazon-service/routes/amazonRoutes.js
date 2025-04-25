@@ -2,6 +2,9 @@ const express = require('express');
 const Product = require('../models/product');
 const router = express.Router();
 
+const path = require('path');
+const auth = require(path.resolve(__dirname, '../../../backend/middleware/auth'));
+
 // Get Amazon Products
 router.get('/', async (req, res) => {
     try {
@@ -13,7 +16,10 @@ router.get('/', async (req, res) => {
 });
 
 // Add Amazon Product
-router.post('/add', async (req, res) => {
+router.post('/add', auth, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied' });
+    }
     try {
         const { name, description, price, category } = req.body;
 
@@ -31,5 +37,27 @@ router.post('/add', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+
+// Delete Amazon Product
+router.delete(
+    '/delete/:id',
+    auth,
+    async (req, res) => {
+      // 1) guard admin
+      if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+  
+      try {
+        // 2) remove by ID
+        const { id } = req.params;
+        await Product.deleteOne({ _id: id });
+        return res.json({ message: 'Deleted successfully' });
+      } catch (err) {
+        console.error('Delete error:', err);
+        return res.status(500).json({ message: err.message });
+      }
+    }
+  );  
 
 module.exports = router;

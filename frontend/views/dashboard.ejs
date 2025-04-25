@@ -1,0 +1,48 @@
+<%- include('layout') %>
+
+<h1>Admin Dashboard</h1>
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<!-- Add new product -->
+<section class="mb-4">
+  <h2>Add Product</h2>
+  <form action="/admin/product/add" method="POST" class="row g-2">
+    <div class="col"><select name="source" class="form-select" required>
+      <option value="">Choose source…</option>
+      <option value="walmart">Walmart</option>
+      <option value="amazon">Amazon</option>
+      <option value="temu">Temu</option>
+    </select></div>
+    <div class="col"><input name="name" placeholder="Name" class="form-control" required></div>
+    <div class="col"><input name="description" placeholder="Description" class="form-control"></div>
+    <div class="col"><input name="price" type="number" step="0.01" placeholder="Price" class="form-control" required></div>
+    <div class="col"><input name="category" placeholder="Category" class="form-control"></div>
+    <div class="col-auto">
+      <button class="btn btn-success">Add</button>
+    </div>
+  </form>
+</section>
+
+<hr/>
+
+<!-- Existing products -->
+<% ['walmart','amazon','temu'].forEach(src=>{ %>
+  <section class="mb-4">
+    <h3 class="text-capitalize"><%= src %> Products</h3>
+    <ul class="list-group">
+      <% eval(src).forEach(p=>{ %>
+        <li class="list-group-item d-flex justify-content-between">
+          <span><%= p.name %> — $<%= p.price %></span>
+          <form action="/admin/product/delete" method="POST">
+            <input type="hidden" name="source" value="<%= src %>">
+            <input type="hidden" name="id"     value="<%= p._id %>">
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </li>
+      <% }); %>
+    </ul>
+  </section>
+<% }); %>
+
