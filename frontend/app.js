@@ -16,8 +16,8 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-    res.locals.flashMessage = req.session.flashMessage;
-    delete req.session.flashMessage;
+    res.locals.flashMessage = req.session.error
+    delete req.session.error
     next();
 });
 
@@ -215,7 +215,7 @@ app.get(
         amazon:   amazon.data,
         temu:     temu.data,
         orders:   orders.data,
-        error:    null
+        error:   res.locals.error
       });
     } catch (e) {
       res.render('dashboard', {
@@ -236,13 +236,22 @@ app.post(
   isAuthenticated,
   isAdmin,
   async (req, res) => {
-    const { source, name, description, price, category } = req.body;
-    await axios.post(
-      `${API_BASE_URL}/api/${source}/add`,
-      { name, description, price, category },
-      { headers: { Authorization: `Bearer ${req.session.token}` } }
-    );
-    res.redirect('/admin/dashboard');
+    const { source, name, description, price, category, image } = req.body;
+    if (!source || !name || !description || !price || !category) {
+      req.session.error = 'All fields (source, name, description, price & category) are required'
+      return res.redirect('/admin/dashboard')
+    }
+    try {
+      await axios.post(
+        `${API_BASE_URL}/api/${source}/add`,
+        { name, description, price, category, image },
+        { headers: { Authorization: `Bearer ${req.session.token}` } }
+      )
+      res.redirect('/admin/dashboard')
+    } catch {
+      req.session.error = 'Add failed – please try again'
+      res.redirect('/admin/dashboard')
+    }
   }
 );
 

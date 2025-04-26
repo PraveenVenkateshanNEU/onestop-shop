@@ -16,30 +16,61 @@ router.get('/', async (req, res) => {
 });
 
 // Add Walmart Product
-router.post('/add', auth, async (req, res) => {
-
-    if (req.user.role !== 'admin') {
+router.post(
+    '/add',
+    auth,
+    async (req, res) => {
+      if (req.user.role !== 'admin')
         return res.status(403).json({ message: 'Access denied' });
-    }
-    
-    try {
-        const { name, description, price, category } = req.body;
-
+  
+      try {
+        const { name, description, price, category, image } = req.body;
+  
+        // Build either uploaded-file URL or fallback URL
+        const imageUrl = req.file
+          ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+          : (image || 'https://via.placeholder.com/150');
+  
         const newProduct = new Product({
-            name,
-            description,
-            price,
-            category,
-            image: req.body.image || "https://via.placeholder.com/150"
+          name,
+          description,
+          price,
+          category,
+          image: imageUrl
         });
-
+  
         await newProduct.save();
         res.status(201).json(newProduct);
-    } catch (err) {
+      } catch (err) {
         res.status(500).json({ message: err.message });
+      }
     }
+  );
+
+// router.post('/add', auth, async (req, res) => {
+
+//     if (req.user.role !== 'admin') {
+//         return res.status(403).json({ message: 'Access denied' });
+//     }
     
-});
+//     try {
+//         const { name, description, price, category } = req.body;
+
+//         const newProduct = new Product({
+//             name,
+//             description,
+//             price,
+//             category,
+//             image: req.body.image || "https://via.placeholder.com/150"
+//         });
+
+//         await newProduct.save();
+//         res.status(201).json(newProduct);
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+    
+// });
 
 // Delete Amazon Product
 router.delete(

@@ -8,7 +8,7 @@
 <!-- Add new product -->
 <section class="mb-4">
   <h2>Add Product</h2>
-  <form action="/admin/product/add" method="POST" class="row g-2">
+  <form action="/admin/product/add" method="POST" class="row g-2" >
     <div class="col"><select name="source" class="form-select" required>
       <option value="">Choose source…</option>
       <option value="walmart">Walmart</option>
@@ -19,6 +19,8 @@
     <div class="col"><input name="description" placeholder="Description" class="form-control"></div>
     <div class="col"><input name="price" type="number" step="0.01" placeholder="Price" class="form-control" required></div>
     <div class="col"><input name="category" placeholder="Category" class="form-control"></div>
+    <div class="col"><input type="text" name="image" placeholder="Image URL (fallback)" class="form-control" /></div>
+    <!-- <div class="col"><input type="file" name="imageFile" accept="image/*" class="form-control" /></div> -->
     <div class="col-auto">
       <button class="btn btn-success">Add</button>
     </div>
@@ -34,7 +36,10 @@
     <ul class="list-group">
       <% eval(src).forEach(p=>{ %>
         <li class="list-group-item d-flex justify-content-between">
-          <span><%= p.name %> — $<%= p.price %></span>
+            <div>
+                <img src="<%= p.image %>" alt="<%= p.name %>" style="height:40px; width:auto; margin-right:10px;" />
+                <strong><%= p.name %></strong> — $<%= p.price %>
+            </div>
           <form action="/admin/product/delete" method="POST">
             <input type="hidden" name="source" value="<%= src %>">
             <input type="hidden" name="id"     value="<%= p._id %>">

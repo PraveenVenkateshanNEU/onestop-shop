@@ -1,10 +1,23 @@
 const express = require('express');
 const Product = require('../models/product');
+const multer   = require('multer');
 const router = express.Router();
 const debug = require('debug')('temu:delete');
 
 const path = require('path');
 const auth = require(path.resolve(__dirname, '../../../backend/middleware/auth'));
+
+// Multer setup — store all files in shared ../uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, path.join(__dirname, '../uploads')); // ← points to microservices/uploads
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      cb(null, Date.now() + ext);
+    }
+  });
+  const upload = multer({ storage });
 
 // Get Temu Products
 router.get('/', async (req, res) => {
@@ -17,27 +30,60 @@ router.get('/', async (req, res) => {
 });
 
 // Add Temu Product
-router.post('/add', auth, async (req, res) => {
-    if (req.user.role !== 'admin') {
+// — ADD product (with imageFile or URL fallback) —
+router.post(
+    '/add',
+    auth,
+    upload.single('imageFile'),  // ← multer middleware
+    async (req, res) => {
+      if (req.user.role !== 'admin')
         return res.status(403).json({ message: 'Access denied' });
-    }
-    try {
-        const { name, description, price, category } = req.body;
-
+  
+      try {
+        const { name, description, price, category, image } = req.body;
+  
+        // Build either uploaded-file URL or fallback URL
+        const imageUrl = req.file
+          ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+          : (image || 'https://via.placeholder.com/150');
+  
         const newProduct = new Product({
-            name,
-            description,
-            price,
-            category,
-            image: `https://via.placeholder.com/150`
+          name,
+          description,
+          price,
+          category,
+          image: imageUrl
         });
-
+  
         await newProduct.save();
         res.status(201).json(newProduct);
-    } catch (err) {
+      } catch (err) {
         res.status(500).json({ message: err.message });
+      }
     }
-});
+  );
+
+// router.post('/add', auth, async (req, res) => {
+//     if (req.user.role !== 'admin') {
+//         return res.status(403).json({ message: 'Access denied' });
+//     }
+//     try {
+//         const { name, description, price, category } = req.body;
+
+//         const newProduct = new Product({
+//             name,
+//             description,
+//             price,
+//             category,
+//             image: `https://via.placeholder.com/150`
+//         });
+
+//         await newProduct.save();
+//         res.status(201).json(newProduct);
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+// });
 
 // Delete Amazon Product
 router.delete(
