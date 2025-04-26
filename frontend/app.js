@@ -252,6 +252,51 @@ app.post(
   }
 );
 
+// Show edit form
+app.get(
+  '/admin/product/edit',
+  isAuthenticated, isAdmin,
+  async (req, res) => {
+    const { source, id } = req.query;
+    try {
+      const { data: product } = await axios.get(
+        `${API_BASE_URL}/api/${source}/${id}`,
+        { headers: { Authorization: `Bearer ${req.session.token}` } }
+      );
+      res.render('edit-product', { product, source, error: null });
+    } catch (err) {
+      console.error('could not load product for editing', err)
+      req.session.error = 'Could not load product for editing';
+      return res.redirect('/admin/dashboard');
+    }
+  }
+);
+
+// Handle update
+app.post(
+  '/admin/product/update',
+  isAuthenticated, isAdmin,
+  async (req, res) => {
+    const { source, id, name, description, price, category, image } = req.body;
+    // basic validation
+    if (!source||!id||!name||!price) {
+      req.session.error = 'Missing required fields';
+      return res.redirect(`/admin/product/edit?source=${source}&id=${id}`);
+    }
+    try {
+      await axios.put(
+        `${API_BASE_URL}/api/${source}/update/${id}`,
+        { name, description, price, category, image },
+        { headers: { Authorization: `Bearer ${req.session.token}` } }
+      );
+      res.redirect('/admin/dashboard');
+    } catch {
+      req.session.error = 'Update failed';
+      res.redirect(`/admin/product/edit?source=${source}&id=${id}`);
+    }
+  }
+);
+
 
 // Start Server
 const PORT = process.env.PORT || 3000;

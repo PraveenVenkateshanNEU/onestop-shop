@@ -1,0 +1,38 @@
+<%- include('layout') %>
+
+<h2>Edit <%= source.charAt(0).toUpperCase()+source.slice(1) %> Product</h2>
+
+<form action="/admin/product/update" method="POST" class="row g-2 mb-4">
+  <input type="hidden" name="source" value="<%= source %>">
+  <input type="hidden" name="id"     value="<%= product._id %>">
+
+  <div class="col-md-4">
+    <label class="form-label">Name</label>
+    <input name="name" value="<%= product.name %>" class="form-control" required>
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label">Description</label>
+    <input name="description" value="<%= product.description %>" class="form-control">
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Price</label>
+    <input name="price" type="number" step="0.01" value="<%= product.price %>" class="form-control" required>
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Category</label>
+    <input name="category" value="<%= product.category %>" class="form-control">
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Image URL</label>
+    <input name="image" value="<%= product.image %>" class="form-control">
+  </div>
+
+  <div class="col-auto align-self-end">
+    <button class="btn btn-primary">Update</button>
+    <a href="/admin/dashboard" class="btn btn-link">Cancel</a>
+  </div>
+</form>

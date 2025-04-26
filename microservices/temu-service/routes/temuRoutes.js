@@ -88,6 +88,36 @@ router.delete(
       }
     }
   );
+
+  router.get('/:id', async (req, res) => {
+    try {
+      const product = await Product.findById(req.params.id);
+      if (!product) return res.status(404).json({ message: 'Product not found' });
+      res.json(product);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+  
+  // 2) update product
+  router.put(
+    '/update/:id',
+    auth,
+    async (req, res) => {
+      if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
+      try {
+        const { name, description, price, category, image } = req.body;
+        const updated = await Product.findByIdAndUpdate(
+          req.params.id,
+          { name, description, price, category, image },
+          { new: true }
+        );
+        res.json(updated);
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
+    }
+  );
   
 
 module.exports = router;

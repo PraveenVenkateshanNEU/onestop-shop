@@ -13,7 +13,7 @@
     <% products.forEach(product => { %>
         <div class="col-md-4 mb-3">
             <div class="card">
-                <img src="<%= product.image %>" class="card-img-top" alt="<%= product.name %>">
+                <img src="<%= product.image %>" class="card-img-top" alt="<%= product.name %>" style="height:150px; object-fit:cover;">
                 <div class="card-body">
                     <h5 class="card-title"><%= product.name %></h5>
                     <p class="card-text"><%= product.description %></p>

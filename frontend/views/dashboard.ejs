@@ -40,11 +40,15 @@
                 <img src="<%= p.image %>" alt="<%= p.name %>" style="height:40px; width:auto; margin-right:10px;" />
                 <strong><%= p.name %></strong> — $<%= p.price %>
             </div>
-          <form action="/admin/product/delete" method="POST">
-            <input type="hidden" name="source" value="<%= src %>">
-            <input type="hidden" name="id"     value="<%= p._id %>">
-            <button class="btn btn-sm btn-danger">Delete</button>
-          </form>
+            <div class="btn-group">
+            <a class="btn btn-sm btn-outline-primary me-1" href="/admin/product/edit?source=<%= src %>&id=<%= p._id %>">Edit</a>
+            <form action="/admin/product/delete" method="POST">
+                <input type="hidden" name="source" value="<%= src %>">
+                <input type="hidden" name="id"     value="<%= p._id %>">
+                <button class="btn btn-sm btn-danger">Delete</button>
+            </form>
+            </div>
+            </li>
         </li>
       <% }); %>
     </ul>
