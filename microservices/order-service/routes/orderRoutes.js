@@ -1,11 +1,10 @@
 const express = require('express');
 const path = require('path');
 const Order = require('../models/order');
-//const auth = require('../../backend/middleware/auth'); // Ensure correct path to auth middleware
 const auth = require(path.resolve(__dirname, '../../../backend/middleware/auth'));
 const router = express.Router();
 
-// ✅ Place an Order
+// Place an Order
 router.post('/create', auth, async (req, res) => {
     try {
         const { products } = req.body;
@@ -29,7 +28,7 @@ router.post('/create', auth, async (req, res) => {
     }
 });
 
-// ✅ Get Orders for Logged-in User
+// Get Orders for Logged-in User
 router.get('/', auth, async (req, res) => {
     try {
         const orders = await Order.find({ userId: req.user.userId }).sort({ createdAt: -1 });
@@ -39,7 +38,7 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
-// ✅ Get Order by ID
+// Get Order by ID
 router.get('/:orderId', auth, async (req, res) => {
     try {
         const order = await Order.findOne({ _id: req.params.orderId, userId: req.user.userId });

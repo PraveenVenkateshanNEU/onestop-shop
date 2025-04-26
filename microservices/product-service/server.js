@@ -8,10 +8,10 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Connect to MongoDB
+// Connect to MongoDB
 connectDB();
 
-// ✅ Use Product Routes
+// Use Product Routes
 app.use('/', productRoutes);
 
 app.listen(5006, () => {

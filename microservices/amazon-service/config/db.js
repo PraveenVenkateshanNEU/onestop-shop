@@ -13,9 +13,9 @@ const connectDB = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        console.log('✅ Amazon Service: MongoDB Connected!');
+        console.log('Amazon Service: MongoDB Connected!');
     } catch (err) {
-        console.error('❌ MongoDB Connection Error:', err.message);
+        console.error('MongoDB Connection Error:', err.message);
         process.exit(1);
     }
 };

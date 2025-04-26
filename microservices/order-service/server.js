@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 
 connectDB();
 
-// ✅ Use Order Routes
+// Use Order Routes
 app.use('/', orderRoutes);
 
 app.listen(5007, () => {

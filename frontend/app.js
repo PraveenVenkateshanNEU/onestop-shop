@@ -46,21 +46,19 @@ function isAdmin(req, res, next) {
 
 
 
-// ✅ Route: Home (Login)
+// Route: Home (Login)
 app.get('/', (req, res) => {
     res.redirect('/login');
 });
 
-// ✅ Route: Login Page
+// Route: Login Page
 app.get('/login', (req, res) => {
     res.render('login');
 });
 
 app.post('/login', async (req, res) => {
-    //const { email, password } = req.body;
 
     try {
-        //const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
         const { email, password } = req.body;
         const { data } = await axios.post(
           `${API_BASE_URL}/api/auth/login`,
@@ -68,8 +66,7 @@ app.post('/login', async (req, res) => {
         );
         // store JWT
           req.session.token = data.token;
-        // decode to get role, username, id
-        const payload = JSON.parse(
+          const payload = JSON.parse(
           Buffer.from(data.token.split('.')[1], 'base64').toString()
         );
         req.session.user = {
@@ -81,23 +78,12 @@ app.post('/login', async (req, res) => {
           payload.role === 'admin' ? '/admin/dashboard' : '/products'
         );
 
-        // req.session.token = response.data.token;
-
-        // // Optional: store user data in session if needed
-        // const decoded = JSON.parse(Buffer.from(response.data.token.split('.')[1], 'base64').toString());
-        // req.session.user = decoded;
-
-        // if (decoded.role === 'admin') {
-        //     res.redirect('http://localhost:3005/'); // Admin Panel
-        // } else {
-        //     res.redirect('/products'); // Regular user
-        // }
     } catch (err) {
         res.render('login', { error: 'Invalid credentials' });
     }
 });
 
-// ✅ Route: Register Page
+// Route: Register Page
 app.get('/register', (req, res) => {
     res.render('register');
 });
@@ -113,7 +99,7 @@ app.post('/register', async (req, res) => {
     }
 });
 
-// ✅ Route: Products Page
+// Route: Products Page
 app.get('/products', async (req, res) => {
     if (!req.session.token) return res.redirect('/login');
 
@@ -127,7 +113,7 @@ app.get('/products', async (req, res) => {
     }
 });
 
-// ✅ Add to Cart
+// Add to Cart
 app.post('/cart/add', (req, res) => {
     const { productId, name, price, source, quantity } = req.body;
     const item = {
@@ -146,13 +132,13 @@ app.post('/cart/add', (req, res) => {
     res.redirect('/products');
 });
 
-// ✅ View Cart
+// View Cart
 app.get('/cart', (req, res) => {
     if (!req.session.token) return res.redirect('/login');
     res.render('cart');
 });
 
-// ✅ Checkout
+// Checkout
 app.post('/cart/checkout', async (req, res) => {
     if (!req.session.token || req.session.cart.length === 0) return res.redirect('/cart');
     try {
@@ -169,7 +155,7 @@ app.post('/cart/checkout', async (req, res) => {
     }
 });
 
-// ✅ Order History
+// Order History
 app.get('/orders', async (req, res) => {
     if (!req.session.token) return res.redirect('/login');
     try {
@@ -182,7 +168,7 @@ app.get('/orders', async (req, res) => {
     }
 });
 
-// ✅ Logout
+// Logout
 app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/login');
@@ -194,7 +180,6 @@ app.get(
   isAdmin,
   async (req, res) => {
     try {
-      // fetch all sources + orders
       const [walmart, amazon, temu, orders] = await Promise.all([
         axios.get(`${API_BASE_URL}/api/walmart`, {
           headers: { Authorization: `Bearer ${req.session.token}` }
@@ -226,9 +211,6 @@ app.get(
     }
   }
 );
-
-
-
 
 // Add product to any source
 app.post(
@@ -271,6 +253,6 @@ app.post(
 );
 
 
-// ✅ Start Server
+// Start Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🌐 EJS UI running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`EJS UI running on http://localhost:${PORT}`));

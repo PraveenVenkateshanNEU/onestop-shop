@@ -47,28 +47,6 @@ router.post(
     }
   );
 
-// router.post('/add', auth, async (req, res) => {
-//     if (req.user.role !== 'admin') {
-//         return res.status(403).json({ message: 'Access denied' });
-//     }
-//     try {
-//         const { name, description, price, category } = req.body;
-
-//         const newProduct = new Product({
-//             name,
-//             description,
-//             price,
-//             category,
-//             image: `https://via.placeholder.com/150`
-//         });
-
-//         await newProduct.save();
-//         res.status(201).json(newProduct);
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-// });
-
 // Delete Amazon Product
 router.delete(
     '/delete/:id',

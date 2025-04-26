@@ -3,10 +3,9 @@ const axios = require('axios');
 const router = express.Router();
 const path = require('path');
 const auth = require(path.resolve(__dirname, '../../../backend/middleware/auth'));
-//const auth = require('../../backend/middleware/auth');
 
 
-// ✅ Fetch products from Walmart
+// Fetch products from Walmart
 const fetchWalmartProducts = async () => {
     try {
         const response = await axios.get('http://localhost:5000/api/walmart');
@@ -17,7 +16,7 @@ const fetchWalmartProducts = async () => {
     }
 };
 
-// ✅ Fetch products from Amazon
+// Fetch products from Amazon
 const fetchAmazonProducts = async () => {
     try {
         const response = await axios.get('http://localhost:5000/api/amazon');
@@ -28,7 +27,7 @@ const fetchAmazonProducts = async () => {
     }
 };
 
-// ✅ Fetch products from Temu
+// Fetch products from Temu
 const fetchTemuProducts = async () => {
     try {
         const response = await axios.get('http://localhost:5000/api/temu');
@@ -39,16 +38,13 @@ const fetchTemuProducts = async () => {
     }
 };
 
-// ✅ Utility function to tag source
+// Utility function to tag source
 const tagWithSource = (products, source) =>
     products.map(p => ({ ...p, source }));
 
-// ✅ Aggregate all products from Walmart, Amazon, and Temu
+// Aggregate all products from Walmart, Amazon, and Temu
 router.get('/', async (req, res) => {
     try {
-        // const walmartProducts = await fetchWalmartProducts();
-        // const amazonProducts = await fetchAmazonProducts();
-        // const temuProducts = await fetchTemuProducts();
         const walmartProducts = tagWithSource(await fetchWalmartProducts(), 'Walmart');
         const amazonProducts = tagWithSource(await fetchAmazonProducts(), 'Amazon');
         const temuProducts = tagWithSource(await fetchTemuProducts(), 'Temu');
