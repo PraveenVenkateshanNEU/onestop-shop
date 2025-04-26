@@ -170,7 +170,8 @@ app.get('/orders', async (req, res) => {
 
 // Logout
 app.get('/logout', (req, res) => {
-    req.session.destroy();
+    //req.session.destroy();
+    delete req.session.user;
     res.redirect('/login');
 });
 
